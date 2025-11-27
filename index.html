@@ -25,16 +25,23 @@
     }
 
     body {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 5%;
-      /* Simplified background with just the image */
-      background: url('mybg.jpg') center/cover no-repeat fixed;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      position: relative;
-    }
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 5%;
+  background: url('mybg.jpg') center/cover no-repeat fixed;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  position: relative;
+}
+
+/* Fix disappearing background on iPhone */
+@media (max-width: 820px) {
+  body {
+    background-attachment: scroll; /* fallback */
+  }
+}
+
 
     /* Add a subtle overlay for better text readability */
     body::after {
