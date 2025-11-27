@@ -29,22 +29,22 @@
       align-items: center;
       justify-content: space-between;
       padding: 0 5%;
-      background:
-        url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80') center/cover no-repeat,
-        linear-gradient(180deg,#06060a 0%, #0b0b12 100%);
+      /* Simplified background with just the image */
+      background: url('mybg.jpg') center/cover no-repeat fixed;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
       position: relative;
     }
 
-    body::before {
+    /* Add a subtle overlay for better text readability */
+    body::after {
       content: '';
-      position: absolute;
+      position: fixed;
       top: 0;
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(6, 6, 10, 0.85);
+      background: rgba(6, 6, 10, 0.6);
       z-index: -1;
     }
 
