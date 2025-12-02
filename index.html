@@ -46,7 +46,7 @@ body::before {
 }
 
 
-    /* Add a subtle overlay for better text readability */
+    
     body::after {
       content: '';
       position: fixed;
@@ -58,7 +58,7 @@ body::before {
       z-index: -1;
     }
 
-    /* Header with name and contact info */
+    
     .header {
       position: absolute;
       top: 2rem;
@@ -98,7 +98,7 @@ body::before {
       color: var(--accent-light);
     }
 
-    /* Text content area */
+    
     .text-content {
       left: -5%;
       width: 60%;
@@ -121,7 +121,7 @@ body::before {
       padding-top: 1rem;
     }
 
-    /* Custom scrollbar */
+    
     .text-description::-webkit-scrollbar {
       width: 0.25rem;
     }
@@ -136,7 +136,7 @@ body::before {
       border-radius: 0.625rem;
     }
 
-    /* The vertical container */
+    
     .vertical-container {
       width: 25%;
       height: 50%;
@@ -150,7 +150,7 @@ body::before {
       padding: 0;
     }
 
-    /* Navigation arrows */
+    
     .nav-arrow {
       font-size: 2rem;
       color: var(--accent-light);
@@ -166,7 +166,7 @@ body::before {
       opacity: 1;
     }
 
-    /* each section item */
+    
     .section-item {
       width: 100%;
       height: 30%;
@@ -221,7 +221,7 @@ body::before {
       background: transparent;
     }
 
-    /* Non-selected items - smaller height */
+    
     .section-item:not(.selected) {
       width: 70%;
       height: 10%;
@@ -232,7 +232,7 @@ body::before {
       font-size: 1.7rem;
     }
 
-    /* Publications list */
+    
     .publications-list {
       list-style-type: none;
       padding-left: 0;
@@ -270,7 +270,7 @@ body::before {
       color: var(--accent-light);
     }
 
-    /* Education and experience lists */
+    
     .timeline {
       list-style-type: none;
       padding-left: 0;
@@ -310,7 +310,7 @@ body::before {
       }
     }
 
-    /* Responsive design */
+    
     @media (max-width: 75rem) {
       body {
         padding: 0 3%;
@@ -390,12 +390,12 @@ body::before {
   </div>
 
   <div class="vertical-container" id="stage" aria-hidden="false">
-    <!-- Navigation arrows with floating animation -->
+    
     <div class="nav-arrow" id="nav-up">
       <i class="fas fa-chevron-up"></i>
     </div>
     
-    <!-- Three sections for the website -->
+    
     <div class="section-item" data-id="0" id="section-0" style="transform: rotateX(-17deg) rotateY(10deg) rotateZ(-10deg);
   transform-style: preserve-3d;">
       <div class="item-title">About Me</div>
@@ -434,7 +434,7 @@ body::before {
       let selected = 0;
       const totalSections = sections.length;
 
-      // Content for each section
+      
       const sectionContent = [
         {
           title: "About Me",
@@ -498,13 +498,13 @@ body::before {
         }
       ];
 
-      // Update text content
+      
       function updateTextContent() {
         const content = sectionContent[selected];
         textDescription.innerHTML = content.description;
       }
 
-      // Update section positions and selection
+      
       function updateSections() {
         sections.forEach((el, i) => {
           const isSelected = (i === selected);
@@ -514,51 +514,51 @@ body::before {
         updateTextContent();
       }
 
-      // Helper to normalize index
+      
       function mod(n, m) { 
         return ((n % m) + m) % m; 
       }
 
-      // Rotate by steps (positive steps = move up, negative = move down)
+      
       let busy = false;
       function rotate(steps) {
         if(busy) return;
         busy = true;
         
-        // Update selected index
+        
         selected = mod(selected - steps, totalSections);
         
-        // Update positions
+        
         updateSections();
 
-        // Throttle time slightly shorter than CSS transition
+        
         setTimeout(() => { busy = false; }, 500);
       }
 
-      // Keyboard arrows
+      
       window.addEventListener('keydown', (e) => {
         if (e.key === 'ArrowUp' || e.key === 'PageUp') { e.preventDefault(); rotate(1); }
         if (e.key === 'ArrowDown' || e.key === 'PageDown') { e.preventDefault(); rotate(-1); }
       });
 
-      // Clicking a section jumps it into selection
+      
       sections.forEach((el, idx) => {
         el.addEventListener('click', () => {
-          // Compute steps from current selected to target
+          
           const steps = (idx - selected + totalSections) % totalSections;
           if (steps === 0) return;
           rotate(-steps);
         });
       });
 
-      // Navigation arrows
+      
       navUp.addEventListener('click', () => rotate(1));
       navDown.addEventListener('click', () => rotate(-1));
 
-      // Initial setup
+      
       updateSections();
 
-      // Initial entrance animation
+      
       requestAnimationFrame(() => {
         sections.forEach((el, idx) => {
           el.style.opacity = 0;
@@ -568,7 +568,7 @@ body::before {
           }, 80);
         });
         
-        // Remove transition delays after initial animation
+        
         setTimeout(() => {
           sections.forEach(el => {
             el.style.transitionDelay = '';
