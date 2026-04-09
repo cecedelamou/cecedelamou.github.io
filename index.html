@@ -14,9 +14,6 @@
   <style>
     /* -------------------------------------------------------
        CRAZY SLEEK — single-file homepage
-       - WebGL ambient background
-       - scroll snap sections + smooth transitions
-       - glass UI + micro-interactions + magnetic buttons
     -------------------------------------------------------- */
 
     :root{
@@ -206,16 +203,13 @@
       position:relative;
     }
 
-    /*.wrap{ width: min(var(--max), 100%); display:grid; gap: 18px; grid-template-columns: 1.25fr .75fr; align-items:start; } */
-
     .wrap{ 
-  width: min(var(--max), 100%); 
-  display:grid; 
-  gap: 18px; 
-  /* We increased the first column and decreased the second */
-  grid-template-columns: 1.5fr 0.5fr; 
-  align-items:start; 
-}
+      width: min(var(--max), 100%); 
+      display:grid; 
+      gap: 18px; 
+      grid-template-columns: 1.5fr 0.5fr; 
+      align-items:start; 
+    }
 
     .heroCard{
       border-radius: var(--r2); background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
@@ -226,13 +220,6 @@
     body.ready .heroCard{ transform: translateY(0); opacity:1; }
 
     .heroTop{ display:flex; gap: 18px; padding: 22px; align-items:center; }
-    .portrait{
-      width: 92px; height: 92px; border-radius: 26px; flex: 0 0 auto;
-      border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.06);
-      overflow:hidden; position:relative; box-shadow: 0 20px 60px rgba(0,0,0,.45);
-    }
-    .portrait img{ width:100%; height:100%; object-fit:cover; display:block; filter: contrast(105%); }
-
     .heroMeta{ display:flex; flex-direction:column; gap: 6px; min-width:0; }
     .name{ font-size: clamp(24px, 2.2vw, 34px); font-weight: 820; letter-spacing: -0.04em; margin:0; line-height: 1.06; }
     .titleLine{ display:flex; flex-wrap:wrap; gap: 10px; align-items:center; color: var(--muted); font-size: 14px; }
@@ -264,19 +251,6 @@
       transform: translateY(22px); opacity:0; transition: transform var(--dur) var(--ease), opacity var(--dur) var(--ease);
     }
     body.ready .panel{ transform: translateY(0); opacity:1; }
-    .panelHead{ padding: 16px 18px; display:flex; align-items:center; justify-content:space-between; border-bottom: 1px solid rgba(255,255,255,.10); }
-    .panelHead b{ font-size: 12px; letter-spacing: .03em; text-transform: uppercase; color: var(--muted); }
-    .chip{ font-family:"JetBrains Mono", monospace; font-size: 10px; padding: 4px 8px; border-radius: 999px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); }
-    .panelBody{ padding: 14px 18px 18px; }
-
-    .row{
-      display:flex; align-items:flex-start; justify-content:space-between; gap: 14px; padding: 12px;
-      border-radius: 16px; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.10);
-      margin-bottom: 8px; text-decoration:none; color: inherit; transition: all 260ms var(--ease);
-    }
-    .row:hover{ border-color: rgba(255,255,255,.2); background: rgba(255,255,255,.07); transform: translateY(-2px); }
-    .row .l b{ font-size: 13px; color: rgba(245,247,255,.9); display:block; margin-bottom: 2px; }
-    .row .l span{ font-size: 12px; color: var(--muted); line-height:1.4; }
 
     .sectionCard{
       grid-column: 1 / -1; border-radius: var(--r2); background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
@@ -286,6 +260,7 @@
     section.inView .sectionCard{ transform: translateY(0); opacity:1; }
     .sectionHead{ padding: 18px 20px; border-bottom: 1px solid rgba(255,255,255,.10); display:flex; justify-content:space-between; align-items:center; }
     .sectionHead h2{ margin:0; font-size: 16px; letter-spacing: .02em; }
+    .chip{ font-family:"JetBrains Mono", monospace; font-size: 10px; padding: 4px 8px; border-radius: 999px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); }
     .sectionBody{ padding: 18px 20px 22px; color: var(--muted); line-height: 1.75; font-size: 15px; }
 
     .grid2{ display:grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 12px; }
@@ -322,9 +297,37 @@
     .cmdTop{ padding: 16px; border-bottom: 1px solid rgba(255,255,255,.10); display:flex; align-items:center; gap: 12px; }
     .cmdTop input{ width:100%; background: transparent; border:none; color: white; outline:none; font-size: 15px; }
     .cmdList{ padding: 8px; max-height: 400px; overflow:auto; }
-    .cmdItem{ padding: 12px; border-radius: 12px; display:flex; justify-content:space-between; cursor:pointer; }
-    .cmdItem:hover{ background: rgba(255,255,255,.05); }
-    .kbd{ font-family: monospace; font-size: 10px; border: 1px solid rgba(255,255,255,.1); padding: 2px 6px; border-radius: 4px; }
+
+    /* --- TOAST NOTIFICATION STYLING --- */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      z-index: 200;
+      padding: 12px 20px;
+      border-radius: 16px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.06));
+      border: 1px solid rgba(119, 255, 211, 0.3); /* Subtle mint border */
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: white;
+      font-size: 14px;
+      font-weight: 500;
+      opacity: 0;
+      pointer-events: none;
+      transition: transform 0.5s var(--ease), opacity 0.4s var(--ease);
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+      pointer-events: auto;
+    }
+    .toast i { color: var(--a1); font-size: 16px; }
 
     @media (max-width: 980px){ .wrap{ grid-template-columns: 1fr; } .nav{ display:none; } }
     @media (max-width: 520px){ .heroTop{ flex-direction:column; align-items:flex-start; } .grid2, .event{ grid-template-columns: 1fr; } }
@@ -333,6 +336,11 @@
 
 <body>
   <div class="vignette" aria-hidden="true"></div>
+
+  <div id="toast" class="toast">
+    <i class="fa-solid fa-circle-check"></i>
+    <span id="toastMsg">Email copied to clipboard!</span>
+  </div>
 
   <div class="chrome" role="navigation">
     <div class="bar" id="topBar">
@@ -402,10 +410,8 @@
             <div style="width: 100%; border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,.15); box-shadow: var(--shadow2);">
               <img src="cecc.jpg" alt="Portrait" style="width: 100%; display: block; object-fit: cover; ">
             </div>
-            <span id="nowChip" style="display: none;"></span>
           </div>
         </aside>
-
       </div>
     </section>
 
@@ -504,56 +510,69 @@
   </div>
 
   <script>
-    const shell = document.querySelector("#shell");
-    const pills = document.querySelectorAll(".pill");
-    const sections = document.querySelectorAll("section[data-section]");
-    const EMAIL = "delamou.cece.cherif.x1@f.mail.nagoya-u.ac.jp"; 
+    document.addEventListener("DOMContentLoaded", () => {
+      const shell = document.querySelector("#shell");
+      const pills = document.querySelectorAll(".pill");
+      const sections = document.querySelectorAll("section[data-section]");
+      const EMAIL = "delamou.cece.cherif.x1@f.mail.nagoya-u.ac.jp"; 
 
-    // Update time chip
-    const fmtNow = () => {
-      const d = new Date();
-      const chip = document.querySelector("#nowChip");
-      if(chip) chip.textContent = d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-    };
-    fmtNow(); setInterval(fmtNow, 30000);
+      // 1. Initial animation
+      requestAnimationFrame(() => document.body.classList.add("ready"));
 
-    // Initial animation
-    requestAnimationFrame(() => document.body.classList.add("ready"));
+      // 2. Navigation Tracking
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if(entry.isIntersecting){
+            const id = entry.target.getAttribute("data-section");
+            pills.forEach(p => p.classList.toggle("active", p.dataset.goto === id));
+            entry.target.classList.add("inView");
+          }
+        });
+      }, { root: shell, threshold: 0.5 });
+      sections.forEach(s => obs.observe(s));
 
-    // Nav tracking
-    const obs = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if(entry.isIntersecting){
-          const id = entry.target.getAttribute("data-section");
-          pills.forEach(p => p.classList.toggle("active", p.dataset.goto === id));
-          entry.target.classList.add("inView");
+      // 3. Smooth Jump Links
+      document.querySelectorAll("[data-jump]").forEach(a => {
+        a.addEventListener("click", (e) => {
+          e.preventDefault();
+          const target = document.getElementById(a.dataset.jump);
+          if(target) target.scrollIntoView({ behavior:"smooth" });
+        });
+      });
+
+      // 4. Beautiful Toast Integrated Copy Email
+      const toast = document.getElementById("toast");
+      
+      const showToast = (msg) => {
+        if(!toast) return;
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 3000);
+      };
+
+      const handleCopyEmail = async () => {
+        try {
+          await navigator.clipboard.writeText(EMAIL);
+          showToast();
+        } catch (err) {
+          console.error("Failed to copy!", err);
         }
-      });
-    }, { root: shell, threshold: 0.5 });
-    sections.forEach(s => obs.observe(s));
+      };
 
-    // Jump links
-    document.querySelectorAll("[data-jump]").forEach(a => {
-      a.addEventListener("click", (e) => {
-        e.preventDefault();
-        const target = document.getElementById(a.dataset.jump);
-        if(target) target.scrollIntoView({ behavior:"smooth" });
+      // Attaching to all potential copy buttons (robust)
+      document.querySelectorAll("#copyEmail").forEach(btn => {
+        btn.addEventListener("click", handleCopyEmail);
       });
+
+      // 5. Command Palette (Logic placeholder)
+      const modal = document.querySelector("#modal");
+      window.onkeydown = (e) => { 
+        if((e.metaKey || e.ctrlKey) && e.key === 'k') { 
+          e.preventDefault(); 
+          modal?.classList.add("open"); 
+        } 
+      };
+      window.onclick = (e) => { if(e.target === modal) modal.classList.remove("open"); };
     });
-
-    // Copy email
-    const copyEmail = () => {
-      navigator.clipboard.writeText(EMAIL);
-      alert("Email copied to clipboard!");
-    };
-    const emailBtn = document.querySelector("#copyEmail");
-    if(emailBtn) emailBtn.onclick = copyEmail;
-
-    // Command Palette
-    const modal = document.querySelector("#modal");
-    document.querySelector("#cmdBtn").onclick = () => modal.classList.add("open");
-    window.onclick = (e) => { if(e.target === modal) modal.classList.remove("open"); };
-    window.onkeydown = (e) => { if((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); modal.classList.add("open"); } };
   </script>
 </body>
 </html>
