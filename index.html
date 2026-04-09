@@ -1,585 +1,559 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="color-scheme" content="dark" />
   <title>Cece Cherif Delamou</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..900&family=JetBrains+Mono:wght@300..800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" referrerpolicy="no-referrer" />
+
   <style>
-    :root {
-      --bg1: rgba(20,20,30,0.95);
-      --glass: rgba(255,255,255,0.04);
-      --accent: rgba(110, 180, 150, 0.8);
-      --accent-light: rgba(130, 210, 180, 0.9);
-      --transition-duration: 600ms;
-      --base-font-size: 1rem;
+    /* -------------------------------------------------------
+       CRAZY SLEEK — single-file homepage
+       - WebGL ambient background
+       - scroll snap sections + smooth transitions
+       - glass UI + micro-interactions + magnetic buttons
+    -------------------------------------------------------- */
+
+    :root{
+      --bg: #070811;
+      --ink: rgba(245,247,255,.92);
+      --muted: rgba(245,247,255,.62);
+      --faint: rgba(245,247,255,.42);
+      --glass: rgba(255,255,255,.06);
+      --glass2: rgba(255,255,255,.10);
+      --stroke: rgba(255,255,255,.12);
+      --a1: #77ffd3;
+      --a2: #6ea8ff;
+      --a3: #c07bff;
+      --a4: #ffd479;
+      --shadow: 0 30px 80px rgba(0,0,0,.45);
+      --shadow2: 0 12px 40px rgba(0,0,0,.55);
+      --r: 20px;
+      --r2: 28px;
+      --ease: cubic-bezier(.16,1,.3,1);
+      --ease2: cubic-bezier(.2,.9,.2,1);
+      --dur: 800ms;
+      --max: 1180px;
+      --pad: clamp(18px, 2.2vw, 28px);
+      --h: clamp(52px, 7vh, 76px);
     }
 
-    html, body {
-      height: 100%;
-      margin: 0;
-      font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
-      overflow: hidden;
-      color: #e9ecff;
-      font-size: var(--base-font-size);
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    html{ background: var(--bg); scroll-behavior:smooth; }
+    body{
+      margin:0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      color: var(--ink);
+      overflow:hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      letter-spacing: -0.015em;
     }
 
-    body {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 5%;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  position: relative;
-}
-
-body::before {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: url('mybg.jpg') top center/cover no-repeat;
-  z-index: -1;
-}
-
-
-    
-    body::after {
-      content: '';
+    body::before{
+      content:"";
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(6, 6, 10, 0.6);
-      z-index: -1;
+      inset: 0;
+      z-index: 0;
+      background: url("mybgB.jpg") center center / cover no-repeat;
+      transform: translateZ(0);
     }
 
-    
-    .header {
-      position: absolute;
-      top: 2rem;
-      left: 2rem;
-      z-index: 100;
-      max-width: 25rem;
+    body::after{
+      content:"";
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      background:
+        radial-gradient(1200px 700px at 30% 18%, rgba(0,0,0,.20), transparent 60%),
+        radial-gradient(900px 700px at 78% 55%, rgba(0,0,0,.20), transparent 60%),
+        linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.55));
+      pointer-events:none;
     }
 
-    .name {
-      font-size: 2.5rem;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-      color: #ffffff;
-      text-shadow: 0 0.125rem 0.625rem rgba(0,0,0,0.5);
+    .vignette{
+      position:fixed;
+      inset:0;
+      z-index:1;
+      pointer-events:none;
+      background:
+        radial-gradient(1200px 700px at 30% 18%, rgba(120,255,220,.12), transparent 55%),
+        radial-gradient(900px 700px at 78% 55%, rgba(110,168,255,.10), transparent 55%),
+        radial-gradient(900px 700px at 55% 80%, rgba(192,123,255,.08), transparent 55%),
+        radial-gradient(1000px 800px at 50% 50%, transparent 50%, rgba(0,0,0,.55) 100%);
+      mix-blend-mode: screen;
+      opacity:.85;
     }
 
-    .title {
-      font-size: 1.2rem;
-      color: var(--accent-light);
-      margin-bottom: 1rem;
+    .chrome{
+      position: fixed;
+      top: env(safe-area-inset-top);
+      left: 0; right: 0;
+      z-index: 50;
+      padding: 14px var(--pad);
+      display:flex;
+      justify-content:center;
+      pointer-events:none;
+    }
+    .chrome .bar{
+      width: min(var(--max), calc(100% - 2*var(--pad)));
+      height: var(--h);
+      border-radius: 999px;
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.05));
+      border: 1px solid rgba(255,255,255,.14);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      box-shadow: 0 18px 60px rgba(0,0,0,.45);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding: 10px 12px;
+      pointer-events:auto;
+      transform: translateY(-10px);
+      opacity:0;
+      transition: transform var(--dur) var(--ease), opacity var(--dur) var(--ease);
+    }
+    body.ready .chrome .bar{ transform: translateY(0); opacity:1; }
+
+    .brand{ display:flex; align-items:center; gap: 12px; padding-left: 10px; min-width: 220px; }
+    .monogram{
+      width: 38px; height: 38px;
+      border-radius: 14px;
+      background:
+        radial-gradient(120% 120% at 30% 20%, rgba(119,255,211,.85), transparent 55%),
+        radial-gradient(120% 120% at 80% 70%, rgba(110,168,255,.75), transparent 55%),
+        rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.14);
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+      position:relative;
+      overflow:hidden;
+    }
+    .monogram:after{
+      content:"";
+      position:absolute; inset:-40%;
+      background: conic-gradient(from 180deg, rgba(255,255,255,.0), rgba(255,255,255,.35), rgba(255,255,255,.0));
+      transform: rotate(0deg);
+      opacity:.45;
+      animation: spin 6s linear infinite;
+    }
+    @keyframes spin{ to{ transform: rotate(360deg); } }
+
+    .brand .who{ display:flex; flex-direction:column; line-height:1.1; }
+    .brand .who b{ font-size: 14px; letter-spacing: -0.02em; }
+    .brand .who span{ font-size: 12px; color: var(--muted); letter-spacing: .02em; }
+
+    .nav{ display:flex; gap: 8px; align-items:center; justify-content:center; flex:1; }
+    .pill{
+      --p: rgba(255,255,255,.06);
+      position:relative;
+      display:inline-flex;
+      align-items:center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: var(--p);
+      border: 1px solid rgba(255,255,255,.10);
+      color: var(--ink);
+      text-decoration:none;
+      font-size: 13px;
+      letter-spacing: .01em;
+      user-select:none;
+      transition: transform 260ms var(--ease), background 260ms var(--ease), border-color 260ms var(--ease), box-shadow 260ms var(--ease);
+      box-shadow: 0 12px 26px rgba(0,0,0,.25);
+      overflow:hidden;
+      cursor:pointer;
+    }
+    .pill:before{
+      content:"";
+      position:absolute;
+      inset:-1px;
+      background: radial-gradient(400px 120px at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,.16), transparent 45%);
+      opacity:0;
+      transition: opacity 260ms var(--ease);
+      pointer-events:none;
+    }
+    .pill:hover{ transform: translateY(-2px); border-color: rgba(255,255,255,.18); box-shadow: 0 18px 40px rgba(0,0,0,.35); }
+    .pill:hover:before{ opacity:1; }
+    .pill.active{ background: linear-gradient(180deg, rgba(119,255,211,.18), rgba(255,255,255,.06)); border-color: rgba(119,255,211,.35); }
+
+    .actions{ display:flex; gap: 8px; align-items:center; justify-content:flex-end; min-width: 220px; padding-right: 6px; }
+    .iconBtn{
+      width: 42px; height: 42px; border-radius: 999px;
+      display:grid; place-items:center; background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10); color: var(--ink); cursor:pointer;
+      transition: transform 260ms var(--ease), border-color 260ms var(--ease), background 260ms var(--ease);
+      box-shadow: 0 12px 26px rgba(0,0,0,.25);
     }
 
-    .contact-info {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      font-size: 0.9rem;
+    .shell{
+      position:relative; z-index: 10; height:100dvh; width:100%;
+      overflow:auto; scroll-snap-type: y mandatory;
+      scroll-padding-top: calc(var(--h) + 28px);
+    }
+    .shell::-webkit-scrollbar{ width: 10px; }
+    .shell::-webkit-scrollbar-thumb{ background: rgba(255,255,255,.10); border-radius: 999px; }
+
+    section{
+      min-height: 100dvh; scroll-snap-align: start;
+      display:flex; align-items:center; justify-content:center;
+      padding: calc(var(--h) + 34px) var(--pad) 60px;
+      position:relative;
     }
 
-    .contact-info a {
-      color: #b8c1ff;
-      text-decoration: none;
-      transition: color 0.3s;
-    }
+    /*.wrap{ width: min(var(--max), 100%); display:grid; gap: 18px; grid-template-columns: 1.25fr .75fr; align-items:start; } */
 
-    .contact-info a:hover {
-      color: var(--accent-light);
-    }
+    .wrap{ 
+  width: min(var(--max), 100%); 
+  display:grid; 
+  gap: 18px; 
+  /* We increased the first column and decreased the second */
+  grid-template-columns: 1.5fr 0.5fr; 
+  align-items:start; 
+}
 
-    
-    .text-content {
-      left: -5%;
-      width: 60%;
-      height: 80%;
-      padding: 2rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      position: relative;
+    .heroCard{
+      border-radius: var(--r2); background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      border: 1px solid rgba(255,255,255,.14); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+      box-shadow: var(--shadow); overflow:hidden; position:relative;
+      transform: translateY(18px); opacity:0; transition: transform var(--dur) var(--ease), opacity var(--dur) var(--ease);
     }
+    body.ready .heroCard{ transform: translateY(0); opacity:1; }
 
-    .text-description {
-      font-size: 1.7rem;
-      line-height: 1.6;
-      color: #b8c1ff;
-      transition: opacity 420ms ease;
-      max-height: 100%;
-      overflow-y: auto;
-      padding-right: 1rem;
-      padding-top: 1rem;
+    .heroTop{ display:flex; gap: 18px; padding: 22px; align-items:center; }
+    .portrait{
+      width: 92px; height: 92px; border-radius: 26px; flex: 0 0 auto;
+      border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.06);
+      overflow:hidden; position:relative; box-shadow: 0 20px 60px rgba(0,0,0,.45);
     }
+    .portrait img{ width:100%; height:100%; object-fit:cover; display:block; filter: contrast(105%); }
 
-    
-    .text-description::-webkit-scrollbar {
-      width: 0.25rem;
+    .heroMeta{ display:flex; flex-direction:column; gap: 6px; min-width:0; }
+    .name{ font-size: clamp(24px, 2.2vw, 34px); font-weight: 820; letter-spacing: -0.04em; margin:0; line-height: 1.06; }
+    .titleLine{ display:flex; flex-wrap:wrap; gap: 10px; align-items:center; color: var(--muted); font-size: 14px; }
+    .tag{
+      font-family: "JetBrains Mono", monospace; font-size: 11px; padding: 6px 10px;
+      border-radius: 999px; color: rgba(245,247,255,.85); background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12); display:inline-flex; gap: 8px; align-items:center;
     }
+    .tag .dot{ width: 8px; height: 8px; border-radius: 99px; background: var(--a1); box-shadow: 0 0 12px var(--a1); }
 
-    .text-description::-webkit-scrollbar-track {
-      background: rgba(255,255,255,0.05);
-      border-radius: 0.625rem;
-    }
+    .heroBody{ padding: 0 22px 18px; color: var(--muted); font-size: clamp(14px, 1.25vw, 16px); line-height: 1.7; }
+    .heroBody b{ color: rgba(245,247,255,.92); font-weight: 720; }
+    .heroBody a{ color: #b8c1ff; text-decoration:none; border-bottom: 1px dashed rgba(184,193,255,.4); }
 
-    .text-description::-webkit-scrollbar-thumb {
-      background: var(--accent);
-      border-radius: 0.625rem;
+    .heroFooter{ padding: 16px 22px 22px; display:flex; gap: 10px; flex-wrap:wrap; border-top: 1px solid rgba(255,255,255,.10); }
+    .cta{
+      position:relative; display:inline-flex; align-items:center; gap: 10px; padding: 11px 14px;
+      border-radius: 14px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12);
+      color: var(--ink); text-decoration:none; font-weight: 640; font-size: 13px; cursor:pointer;
+      transition: all 260ms var(--ease);
     }
+    .cta:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.25); transform: translateY(-2px); }
+    .cta.primary{ background: linear-gradient(180deg, rgba(119,255,211,.22), rgba(255,255,255,.06)); border-color: rgba(119,255,211,.40); }
 
-    
-    .vertical-container {
-      width: 25%;
-      height: 50%;
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      border-radius: 1rem;
-      overflow: visible;
-      padding: 0;
+    .side{ display:flex; flex-direction:column; gap: 14px; }
+    .panel{
+      border-radius: var(--r2); background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.035));
+      border: 1px solid rgba(255,255,255,.12); backdrop-filter: blur(18px); box-shadow: var(--shadow2);
+      transform: translateY(22px); opacity:0; transition: transform var(--dur) var(--ease), opacity var(--dur) var(--ease);
     }
+    body.ready .panel{ transform: translateY(0); opacity:1; }
+    .panelHead{ padding: 16px 18px; display:flex; align-items:center; justify-content:space-between; border-bottom: 1px solid rgba(255,255,255,.10); }
+    .panelHead b{ font-size: 12px; letter-spacing: .03em; text-transform: uppercase; color: var(--muted); }
+    .chip{ font-family:"JetBrains Mono", monospace; font-size: 10px; padding: 4px 8px; border-radius: 999px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); }
+    .panelBody{ padding: 14px 18px 18px; }
 
-    
-    .nav-arrow {
-      font-size: 2rem;
-      color: var(--accent-light);
-      z-index: 20;
-      opacity: 0.7;
-      transition: opacity 0.3s;
-      cursor: pointer;
-      animation: bounce 2s infinite;
-      margin: 1rem 0;
+    .row{
+      display:flex; align-items:flex-start; justify-content:space-between; gap: 14px; padding: 12px;
+      border-radius: 16px; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.10);
+      margin-bottom: 8px; text-decoration:none; color: inherit; transition: all 260ms var(--ease);
     }
+    .row:hover{ border-color: rgba(255,255,255,.2); background: rgba(255,255,255,.07); transform: translateY(-2px); }
+    .row .l b{ font-size: 13px; color: rgba(245,247,255,.9); display:block; margin-bottom: 2px; }
+    .row .l span{ font-size: 12px; color: var(--muted); line-height:1.4; }
 
-    .nav-arrow:hover {
-      opacity: 1;
+    .sectionCard{
+      grid-column: 1 / -1; border-radius: var(--r2); background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      border: 1px solid rgba(255,255,255,.12); backdrop-filter: blur(18px); box-shadow: var(--shadow);
+      transform: translateY(26px); opacity:0; transition: transform var(--dur) var(--ease), opacity var(--dur) var(--ease);
     }
+    section.inView .sectionCard{ transform: translateY(0); opacity:1; }
+    .sectionHead{ padding: 18px 20px; border-bottom: 1px solid rgba(255,255,255,.10); display:flex; justify-content:space-between; align-items:center; }
+    .sectionHead h2{ margin:0; font-size: 16px; letter-spacing: .02em; }
+    .sectionBody{ padding: 18px 20px 22px; color: var(--muted); line-height: 1.75; font-size: 15px; }
 
-    
-    .section-item {
-      width: 100%;
-      height: 30%;
-      border-radius: 0.75rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      user-select: none;
-      cursor: pointer;
-      transition:
-        transform var(--transition-duration) cubic-bezier(.18,.9,.28,1),
-        box-shadow var(--transition-duration) cubic-bezier(.18,.9,.28,1),
-        filter var(--transition-duration) cubic-bezier(.18,.9,.28,1),
-        opacity var(--transition-duration) ease,
-        width var(--transition-duration) ease,
-        height var(--transition-duration) ease;
-      will-change: transform, filter;
-      overflow: hidden;
-      box-shadow: 0 0.5rem 1.5625rem rgba(4, 8, 20, 0.5);
-      background: rgba(30, 30, 45, 0.8);
-      backdrop-filter: blur(0.625rem);
-      border: 0.0625rem solid rgba(255,255,255,0.05);
-      margin: 1% 0;
+    .grid2{ display:grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 12px; }
+    .pub{
+      padding: 16px; border-radius: 18px; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.10);
+      transition: all 260ms var(--ease); position:relative;
     }
+    .pub:hover{ transform: translateY(-2px); border-color: var(--a1); background: rgba(255,255,255,.06); }
+    .pub .t{ font-weight: 720; color: rgba(245,247,255,.92); margin-bottom: 6px; font-size: 14px; }
+    .pub .m{ font-size: 12px; color: var(--a1); margin-bottom: 8px; font-family: "JetBrains Mono", monospace; }
+    .pub a{ font-size: 12px; color: #b8c1ff; text-decoration:none; border-bottom: 1px dashed rgba(184,193,255,.4); }
 
-    .section-item .item-title {
-      font-size: 1.5rem;
-      font-weight: 600;
-      color: #ffffff;
-      text-align: center;
-      padding: 0.5rem;
-      transition: all 0.5s ease;
-      background: transparent;
+    .timeline{ display:grid; gap: 12px; margin-top: 12px; }
+    .event{
+      display:grid; grid-template-columns: 140px 1fr; gap: 12px; padding: 16px;
+      border-radius: 18px; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.10);
+      transition: all 260ms var(--ease);
     }
+    .event:hover{ border-color: var(--a3); background: rgba(255,255,255,.06); }
+    .event.teaching:hover{ border-color: var(--a2); }
+    .when{ font-family:"JetBrains Mono", monospace; font-size: 11px; color: var(--muted); }
+    .what b{ color: rgba(245,247,255,.92); font-weight: 760; font-size: 14px; }
+    .what p{ margin: 6px 0 0; color: var(--muted); font-size: 13px; line-height: 1.6; }
 
-    .section-item.selected {
-      box-shadow: 0 0 1.875rem rgba(110, 180, 150, 0.5);
-      z-index: 10;
-      background: rgba(40, 40, 60, 0.9);
-      transform: perspective(62.5rem) rotateX(15deg) rotateY(-8deg);
-      height: 20%;
-      width: 90%;
-    }
+    .hint{ position:fixed; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 40; pointer-events:none; opacity: 0; transition: opacity 600ms; display:flex; gap: 10px; align-items:center; color: var(--muted); font-size: 11px; text-transform: uppercase; }
+    body.ready .hint{ opacity:1; }
+    .mouse{ width: 22px; height: 34px; border-radius: 999px; border: 1px solid rgba(255,255,255,.22); position:relative; }
+    .mouse:after{ content:""; position:absolute; top: 6px; left: 50%; width: 3px; height: 6px; border-radius: 999px; transform: translateX(-50%); background: white; animation: wheel 1.6s infinite; }
+    @keyframes wheel{ 0%{ transform: translate(-50%, 0); opacity: 0; } 15%{ opacity: 1; } 70%{ transform: translate(-50%, 12px); opacity: 0; } 100%{ opacity: 0; } }
 
-    .section-item.selected .item-title {
-      font-size: 2.9rem;
-      color: var(--accent-light);
-      text-shadow: 0 0 0.625rem rgba(110, 180, 150, 0.5);
-      overflow: visible;
-      white-space: nowrap;
-      transform: scale(1.1);
-      background: transparent;
-    }
+    .modal{ position:fixed; inset:0; z-index: 100; display:none; place-items:center; padding: 24px; background: rgba(0,0,0,.55); backdrop-filter: blur(10px); }
+    .modal.open{ display:grid; }
+    .cmd{ width:min(600px, 100%); border-radius: 26px; background: #12131e; border: 1px solid rgba(255,255,255,.14); box-shadow: 0 40px 120px rgba(0,0,0,.55); overflow:hidden; }
+    .cmdTop{ padding: 16px; border-bottom: 1px solid rgba(255,255,255,.10); display:flex; align-items:center; gap: 12px; }
+    .cmdTop input{ width:100%; background: transparent; border:none; color: white; outline:none; font-size: 15px; }
+    .cmdList{ padding: 8px; max-height: 400px; overflow:auto; }
+    .cmdItem{ padding: 12px; border-radius: 12px; display:flex; justify-content:space-between; cursor:pointer; }
+    .cmdItem:hover{ background: rgba(255,255,255,.05); }
+    .kbd{ font-family: monospace; font-size: 10px; border: 1px solid rgba(255,255,255,.1); padding: 2px 6px; border-radius: 4px; }
 
-    
-    .section-item:not(.selected) {
-      width: 70%;
-      height: 10%;
-      opacity: 0.4;
-    }
-
-    .section-item:not(.selected) .item-title {
-      font-size: 1.7rem;
-    }
-
-    
-    .publications-list {
-      list-style-type: none;
-      padding-left: 0;
-    }
-
-    .publications-list li {
-      margin-bottom: 0.9375rem;
-      padding-bottom: 0.9375rem;
-      border-bottom: 0.0625rem solid rgba(255,255,255,0.05);
-    }
-
-    .publications-list li:last-child {
-      border-bottom: none;
-    }
-
-    .pub-title {
-      font-weight: 600;
-      color: #ffffff;
-      margin-bottom: 0.3125rem;
-    }
-
-    .pub-journal {
-      color: var(--accent);
-      font-style: italic;
-      margin-bottom: 0.3125rem;
-    }
-
-    .pub-link {
-      color: #b8c1ff;
-      text-decoration: none;
-      font-size: 0.9rem;
-    }
-
-    .pub-link:hover {
-      color: var(--accent-light);
-    }
-
-    
-    .timeline {
-      list-style-type: none;
-      padding-left: 0;
-    }
-
-    .timeline li {
-      margin-bottom: 1.25rem;
-      position: relative;
-      padding-left: 1.25rem;
-    }
-
-    .timeline li:before {
-      content: "";
-      position: absolute;
-      left: 0;
-      top: 0.5rem;
-      width: 0.5rem;
-      height: 0.5rem;
-      border-radius: 50%;
-      background: var(--accent);
-    }
-
-    .timeline-date {
-      color: var(--accent-light);
-      font-size: 1.1rem;
-    }
-
-    @keyframes bounce {
-      0%, 20%, 50%, 80%, 100% {
-        transform: translateY(0);
-      }
-      40% {
-        transform: translateY(-0.625rem);
-      }
-      60% {
-        transform: translateY(-0.3125rem);
-      }
-    }
-
-    
-    @media (max-width: 75rem) {
-      body {
-        padding: 0 3%;
-      }
-    }
-
-    @media (max-width: 56.25rem) {
-      body {
-        flex-direction: column;
-        justify-content: flex-start;
-        padding: 1rem;
-        overflow-y: auto;
-      }
-      
-      .header {
-        position: relative;
-        top: auto;
-        left: auto;
-        margin-bottom: 1rem;
-        text-align: center;
-        max-width: 100%;
-      }
-      
-      .vertical-container {
-        width: 90%;
-        height: auto;
-        margin: 1rem 0;
-        order: 2;
-      }
-      
-      .text-content {
-        width: 90%;
-        height: auto;
-        order: 3;
-        padding: 1rem 0;
-      }
-      
-      .nav-arrow {
-        display: none;
-      }
-      
-      .section-item {
-        margin: 0.5rem 0;
-      }
-    }
-    
-    @media (max-width: 37.5rem) {
-      :root {
-        --base-font-size: 0.9rem;
-      }
-      
-      .name {
-        font-size: 2rem;
-      }
-      
-      .text-description {
-        font-size: 1rem;
-      }
-      
-      .section-item .item-title {
-        font-size: 1.2rem;
-      }
-      
-      .section-item.selected .item-title {
-        font-size: 1.6rem;
-      }
-    }
+    @media (max-width: 980px){ .wrap{ grid-template-columns: 1fr; } .nav{ display:none; } }
+    @media (max-width: 520px){ .heroTop{ flex-direction:column; align-items:flex-start; } .grid2, .event{ grid-template-columns: 1fr; } }
   </style>
 </head>
+
 <body>
-  <div class="header">
-    <h1 class="name">Cece Cherif Delamou</h1>
-    <div class="title">Postdoctoral Researcher in Economics</div>
-    <div class="contact-info">
-     <a href="https://www.cecedelamou.com"><i class="fas fa-globe"></i> www.cecedelamou.com</a>
+  <div class="vignette" aria-hidden="true"></div>
+
+  <div class="chrome" role="navigation">
+    <div class="bar" id="topBar">
+      <div class="brand">
+        <div class="monogram"></div>
+        <div class="who">
+          <b>Cece Cherif Delamou</b>
+          <span>Researcher</span>
+        </div>
+      </div>
+      <div class="nav">
+        <a class="pill active" href="#home" data-goto="home">Home</a>
+        <a class="pill" href="#research" data-goto="research">Research</a>
+        <a class="pill" href="#experience" data-goto="experience">Experience</a>
+        <a class="pill" href="#teaching" data-goto="teaching">Teaching</a>
+      </div>
+      <div class="actions">
+        <a class="iconBtn" href="https://cecedelamou.github.io" target="_blank"><i class="fa-solid fa-globe"></i></a>
+      </div>
     </div>
   </div>
 
-  <div class="vertical-container" id="stage" aria-hidden="false">
-    
-    <div class="nav-arrow" id="nav-up">
-      <i class="fas fa-chevron-up"></i>
-    </div>
-    
-    
-    <div class="section-item" data-id="0" id="section-0" style="transform: rotateX(-17deg) rotateY(10deg) rotateZ(-10deg);
-  transform-style: preserve-3d;">
-      <div class="item-title">About Me</div>
-    </div>
-
-    <div class="section-item" data-id="1" id="section-1" style="transform: rotateX(-17deg) rotateY(10deg) rotateZ(-10deg);
-  transform-style: preserve-3d;">
-      <div class="item-title">Research</div>
-    </div>
-
-    <div class="section-item" data-id="2" id="section-2" style="transform: rotateX(-17deg) rotateY(10deg) rotateZ(-10deg);
-  transform-style: preserve-3d;">
-      <div class="item-title">Experience</div>
-    </div>
-    
-    <div class="nav-arrow" id="nav-down">
-      <i class="fas fa-chevron-down"></i>
-    </div>
+  <div class="hint">
+    <div class="mouse"></div>
+    <div>Scroll</div>
   </div>
 
-  <div class="text-content">
-    <div class="text-description" id="text-description">
+  <main class="shell" id="shell">
+    <section id="home" data-section="home">
+      <div class="wrap">
+        <article class="heroCard">
+          <div class="heroTop">
+            <div class="heroMeta">
+              <h1 class="name">Cece Cherif Delamou</h1>
+              <div class="titleLine">
+                <span class="tag"><span class="dot"></span>Assistant professor at Nagoya University</span>
+                <span class="tag"><span class="dot"></span>Researcher in int'l macroeconomics</span>
+              </div>
+            </div>
+          </div>
+          <div class="heroBody">
+            <h3 style="margin-top: 0; color: white;">Hello!</h3>
+            <p>
+              I am an assistant professor at the graduate school of economics of <b>Nagoya University</b>, where I also obtained a <b>Doctor of Economics</b> degree in March 2025. 
+              I previously did undergraduate studies in economics at <b>Université Kofi Annan de Guinée</b> back in my native Guinea, 
+              and then obtained a Master of Economics degree from Nagoya University.
+            </p>
+            <p>
+              My research work has so far consisted of business cycle modeling for short-run policy analysis, as well as long-run policy analysis for 
+              resource-rich developing economies. My interests include <b>int'l macroeconomics</b> and <b>monetary economics</b>.
+            </p>
+            <p>
+              I have taught both advanced and intermediate macroeconomics courses 
+              (syllabi available via <a href="https://syllabus.adm.nagoya-u.ac.jp" target="_blank">Nagoya University</a>).
+            </p>
+          </div>
+          <div class="heroFooter">
+            <a class="cta primary" href="#research" data-jump="research">Explore research</a>
+            <a class="cta" href="#experience" data-jump="experience">Experience</a>
+            <a class="cta" href="#teaching" data-jump="teaching">Teaching</a>
+            <button class="cta" id="copyEmail"><i class="fa-solid fa-copy"></i> Copy email</button>
+          </div>
+        </article>
+
+        <aside class="side">
+          <div class="panel" style="padding: 12px; overflow: hidden;">
+            <div style="width: 100%; border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,.15); box-shadow: var(--shadow2);">
+              <img src="cecc.jpg" alt="Portrait" style="width: 100%; display: block; object-fit: cover; ">
+            </div>
+            <span id="nowChip" style="display: none;"></span>
+          </div>
+        </aside>
+
+      </div>
+    </section>
+
+    <section id="research" data-section="research">
+      <div class="wrap">
+        <article class="sectionCard">
+          <div class="sectionHead"><h2>Peer-Reviewed Publications</h2><span class="chip">Research</span></div>
+          <div class="sectionBody">
+            <div class="grid2">
+              <div class="pub">
+                <div class="t">Fiscal stabilization in resource-rich developing economies amid a resource revenues downturn: A New-Keynesian analysis</div>
+                <div class="m">Resources Policy, 111, 105795, 2025</div>
+                <a href="https://doi.org/10.1016/j.resourpol.2025.105795" target="_blank">doi.org/10.1016/j.resourpol.2025.105795</a>
+              </div>
+              <div class="pub">
+                <div class="t">Curing the Dutch disease: The role of tariffs</div>
+                <div class="m">Journal of Government and Economics, 18, 100147, 2025</div>
+                <a href="https://doi.org/10.1016/j.jge.2025.100147" target="_blank">doi.org/10.1016/j.jge.2025.100147</a>
+              </div>
+              <div class="pub">
+                <div class="t">Fiscal shocks in a two-asset RBC model: A simulation of the Guinean economy</div>
+                <div class="m">Studies in Applied Economics, 16-17, 15-36, 2023</div>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="experience" data-section="experience">
+      <div class="wrap">
+        <article class="sectionCard">
+          <div class="sectionHead"><h2>Professional Timeline</h2><span class="chip">Experience</span></div>
+          <div class="sectionBody">
+            <div class="timeline">
+              <div class="event">
+                <div class="when">Apr 2026 - Present</div>
+                <div class="what"><b>Assistant Professor</b>, Nagoya University<p>Research and teaching.</p></div>
+              </div>
+              <div class="event">
+                <div class="when">Apr 2025 – Mar 2026</div>
+                <div class="what"><b>Postdoctoral Researcher</b>, Nagoya University<p>Research and teaching.</p></div>
+              </div>
+              <div class="event">
+                <div class="when">Aug – Sep 2023</div>
+                <div class="what"><b>Internship</b>, MTEC (MUFG Financial Group), Tokyo<p>Worked on a forex probability model and analyzed the USD/JPY exchange rate using a multimillion-row dataset.</p></div>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="teaching" data-section="teaching">
+      <div class="wrap">
+        <article class="sectionCard">
+          <div class="sectionHead"><h2>Teaching</h2><span class="chip">Academic Courses</span></div>
+          <div class="sectionBody">
+            <div class="timeline">
+              <div class="event teaching">
+                <div class="when">AY 2026 · Spring</div>
+                <div class="what">
+                  <b>Advanced Macroeconomics I</b>
+                  <p>Graduate-level course for developing fundamental research skills in macroeconomics.</p>
+                  <a href="https://syllabus.adm.nagoya-u.ac.jp/affiliation_selection_2026.html" target="_blank" class="cta" style="margin-top:12px; padding: 6px 12px; font-size: 11px;">View Syllabus</a>
+                </div>
+              </div>
+              <div class="event teaching">
+                <div class="when">AY 2026 · Spring</div>
+                <div class="what">
+                  <b>Macroeconomics II</b>
+                  <p>Intermediate course in macroeconomics.</p>
+                  <a href="https://syllabus.adm.nagoya-u.ac.jp/affiliation_selection_2026.html" target="_blank" class="cta" style="margin-top:12px; padding: 6px 12px; font-size: 11px;">View Syllabus</a>
+                </div>
+              </div>
+              <div class="event teaching">
+                <div class="when">AY 2025 · Spring</div>
+                <div class="what">
+                  <b>Advanced Macroeconomics I</b>
+                  <p>Graduate-level course for developing fundamental research skills in macroeconomics.</p>
+                  <a href="https://syllabus.adm.nagoya-u.ac.jp/affiliation_selection_2025.html" target="_blank" class="cta" style="margin-top:12px; padding: 6px 12px; font-size: 11px;">View Syllabus</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal" id="modal">
+    <div class="cmd">
+      <div class="cmdTop"><input id="cmdInput" placeholder="Type a command..." /></div>
+      <div class="cmdList" id="cmdList"></div>
     </div>
   </div>
 
   <script>
-    (function(){
-      const stage = document.getElementById('stage');
-      const sections = Array.from(stage.querySelectorAll('.section-item'));
-      const textDescription = document.getElementById('text-description');
-      const navUp = document.getElementById('nav-up');
-      const navDown = document.getElementById('nav-down');
+    const shell = document.querySelector("#shell");
+    const pills = document.querySelectorAll(".pill");
+    const sections = document.querySelectorAll("section[data-section]");
+    const EMAIL = "delamou.cece.cherif.x1@f.mail.nagoya-u.ac.jp"; 
 
-      let selected = 0;
-      const totalSections = sections.length;
+    // Update time chip
+    const fmtNow = () => {
+      const d = new Date();
+      const chip = document.querySelector("#nowChip");
+      if(chip) chip.textContent = d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    };
+    fmtNow(); setInterval(fmtNow, 30000);
 
-      
-      const sectionContent = [
-        {
-          title: "About Me",
-          description: `
-          <div class="publications-list" style="color: white; max-width: 80rem; margin: 0 auto; font-size: 1.4rem">
-    <div style="float: left; margin: 0 2rem 1.5rem 0;">
-        <img src="cecc.jpg" alt="Cece Cherif Delamou" style="width: 15rem; height: auto; border-radius: 80%; object-fit: cover;">
-    </div>
-    
-    <h3 style="margin-top: 0;">Hello !</h3>
-    <p>I am Cece Cherif Delamou, an assistant professor at the graduate school of economics of Nagoya University. I obtained a Doctor of Economics degree from the same institution in March 2025. My primary field of research is macroeconomics.</p>
+    // Initial animation
+    requestAnimationFrame(() => document.body.classList.add("ready"));
 
-    <p>I previously did undergraduate studies in economics at Kofi Annan university back in my native Guinea, and then obtained a Master of Economics degree from Nagoya University.</p>
-
-    <p>My research work has, so far, consisted of business cycle modeling for short-run policy analysis, as well as long-run policy analysis for resource-rich developing economies.</p>
-
-    <p>I have mainly taught Advanced and Intermediate Macroeconomics courses (syllabi: <a style="color: #b8c1ff" href="https://syllabus.adm.nagoya-u.ac.jp">here</a>).</p>
-
-    <p>I speak French (native), English (fluent) and Japanese (hold JLPT N2).</p>
-</div>
-                      `
-        },
-        {
-          title: "Research",
-          description: `
-            <h3 style="color: white;">**Peer-Reviewed Publications**</h3>
-            <ul class="publications-list">
-              <li>
-                <div class="pub-title">Fiscal stabilization in resource-rich developing economies amid a resource revenues downturn: A New-Keynesian analysis</div>
-                <div class="pub-journal">Resources Policy, 111, 105795, 2025</div>
-                <a href="https://doi.org/10.1016/j.resourpol.2025.105795" class="pub-link">https://doi.org/10.1016/j.resourpol.2025.105795</a>
-              </li>
-              <li>
-                <div class="pub-title">Curing the Dutch disease: The role of tariffs</div>
-                <div class="pub-journal">Journal of Government and Economics, 18, 100147, 2025</div>
-                <a href="https://doi.org/10.1016/j.jge.2025.100147" class="pub-link">https://doi.org/10.1016/j.jge.2025.100147</a>
-              </li>
-              <li>
-                <div class="pub-title">Fiscal shocks in a two-asset RBC model: A simulation of the Guinean economy</div>
-                <div class="pub-journal">Studies in Applied Economics (応用経済学研究), 16 - 17, 15 - 36, 2023</div>
-              </li>
-            </ul>
-          `
-        },
-        {
-          title: "Experience",
-          description: `
-            <ul class="timeline">
-              <li>
-                <div class="timeline-date">Since March 2026</div>
-                <div class="pub-title"><strong>Assistant Professor</strong>, Nagoya University</div>
-                <p style="color: white">Research and teaching.</p>
-              </li>
-              <li>
-                <div class="timeline-date"> April 2025 - March 2026</div>
-                <div class="pub-title"><strong>Postdoctoral Researcher</strong>, Nagoya University</div>
-                <p style="color: white">Research and teaching.</p>
-              </li>
-              <li>
-                <div class="timeline-date">Aug. – Sept. 2023</div>
-                <div class="pub-title"><strong>Internship</strong>, MTEC (MUFG Financial Group), Tokyo</div>
-                <p style="color: white">Worked on a forex probability model and analyzed the USD/JPY exchange rate using a multimillion-row dataset.</p>
-              </li>
-            </ul>
-          `
+    // Nav tracking
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if(entry.isIntersecting){
+          const id = entry.target.getAttribute("data-section");
+          pills.forEach(p => p.classList.toggle("active", p.dataset.goto === id));
+          entry.target.classList.add("inView");
         }
-      ];
-
-      
-      function updateTextContent() {
-        const content = sectionContent[selected];
-        textDescription.innerHTML = content.description;
-      }
-
-      
-      function updateSections() {
-        sections.forEach((el, i) => {
-          const isSelected = (i === selected);
-          el.classList.toggle('selected', isSelected);
-        });
-
-        updateTextContent();
-      }
-
-      
-      function mod(n, m) { 
-        return ((n % m) + m) % m; 
-      }
-
-      
-      let busy = false;
-      function rotate(steps) {
-        if(busy) return;
-        busy = true;
-        
-        
-        selected = mod(selected - steps, totalSections);
-        
-        
-        updateSections();
-
-        
-        setTimeout(() => { busy = false; }, 500);
-      }
-
-      
-      window.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowUp' || e.key === 'PageUp') { e.preventDefault(); rotate(1); }
-        if (e.key === 'ArrowDown' || e.key === 'PageDown') { e.preventDefault(); rotate(-1); }
       });
+    }, { root: shell, threshold: 0.5 });
+    sections.forEach(s => obs.observe(s));
 
-      
-      sections.forEach((el, idx) => {
-        el.addEventListener('click', () => {
-          
-          const steps = (idx - selected + totalSections) % totalSections;
-          if (steps === 0) return;
-          rotate(-steps);
-        });
+    // Jump links
+    document.querySelectorAll("[data-jump]").forEach(a => {
+      a.addEventListener("click", (e) => {
+        e.preventDefault();
+        const target = document.getElementById(a.dataset.jump);
+        if(target) target.scrollIntoView({ behavior:"smooth" });
       });
+    });
 
-      
-      navUp.addEventListener('click', () => rotate(1));
-      navDown.addEventListener('click', () => rotate(-1));
+    // Copy email
+    const copyEmail = () => {
+      navigator.clipboard.writeText(EMAIL);
+      alert("Email copied to clipboard!");
+    };
+    const emailBtn = document.querySelector("#copyEmail");
+    if(emailBtn) emailBtn.onclick = copyEmail;
 
-      
-      updateSections();
-
-      
-      requestAnimationFrame(() => {
-        sections.forEach((el, idx) => {
-          el.style.opacity = 0;
-          setTimeout(() => {
-            el.style.transitionDelay = (idx * 80) + 'ms';
-            el.style.opacity = 1;
-          }, 80);
-        });
-        
-        
-        setTimeout(() => {
-          sections.forEach(el => {
-            el.style.transitionDelay = '';
-          });
-        }, 500);
-      });
-
-    })();
+    // Command Palette
+    const modal = document.querySelector("#modal");
+    document.querySelector("#cmdBtn").onclick = () => modal.classList.add("open");
+    window.onclick = (e) => { if(e.target === modal) modal.classList.remove("open"); };
+    window.onkeydown = (e) => { if((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); modal.classList.add("open"); } };
   </script>
 </body>
 </html>
