@@ -190,14 +190,16 @@
 
     .shell{
       position:relative; z-index: 10; height:100dvh; width:100%;
-      overflow:auto; scroll-snap-type: y mandatory;
+      overflow:auto; 
+      /* Removed scroll-snap-type for continuous scrolling */
       scroll-padding-top: calc(var(--h) + 28px);
     }
     .shell::-webkit-scrollbar{ width: 10px; }
     .shell::-webkit-scrollbar-thumb{ background: rgba(255,255,255,.10); border-radius: 999px; }
 
     section{
-      min-height: 100dvh; scroll-snap-align: start;
+      min-height: 100dvh; 
+      /* Removed scroll-snap-align for continuous scrolling */
       display:flex; align-items:center; justify-content:center;
       padding: calc(var(--h) + 34px) var(--pad) 60px;
       position:relative;
@@ -395,6 +397,9 @@
             <p>
               I have taught both advanced and intermediate macroeconomics courses 
               (syllabi available via <a href="https://syllabus.adm.nagoya-u.ac.jp" target="_blank">Nagoya University</a>).
+            </p>
+            <p>
+              I speak French (native), English (fluent), and Japanese (hold JLPT N2).
             </p>
           </div>
           <div class="heroFooter">
