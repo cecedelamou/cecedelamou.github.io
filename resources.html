@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="color-scheme" content="dark" />
+  <title>Resources | Cece Cherif Delamou</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..900&family=JetBrains+Mono:wght@300..800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --panel: #161616;
+      --accent: #ffffff;
+      --text-dim: rgba(255, 255, 255, 0.6);
+      --border: rgba(255, 255, 255, 0.1);
+      --font-main: 'Inter', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    body, html {
+      margin: 0; padding: 0;
+      background: var(--bg);
+      color: white;
+      font-family: var(--font-main);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Navigation Bar */
+    .header {
+      padding: 1rem 2rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(10, 10, 10, 0.8);
+      backdrop-filter: blur(10px);
+    }
+
+    .brand {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      letter-spacing: -1px;
+      text-decoration: none;
+      color: white;
+    }
+
+    /* Main Layout */
+    .container {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 300px;
+      border-right: 1px solid var(--border);
+      padding: 1.5rem;
+      overflow-y: auto;
+      background: var(--panel);
+    }
+
+    .sidebar h2 {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--text-dim);
+      margin-bottom: 1.5rem;
+    }
+
+    .resource-list {
+      list-style: none; padding: 0; margin: 0;
+    }
+
+    .resource-item {
+      padding: 12px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-bottom: 8px;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.9rem;
+    }
+
+    .resource-item:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .resource-item.active {
+      background: white;
+      color: black;
+    }
+
+    .resource-item i {
+      font-size: 1rem;
+      opacity: 0.7;
+    }
+
+    /* Viewer Area */
+    .viewer {
+      flex: 1;
+      background: #1e1e1e;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .empty-state {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      color: var(--text-dim);
+    }
+
+    @media (max-width: 768px) {
+      .sidebar { width: 80px; padding: 1rem; }
+      .sidebar h2, .resource-item span { display: none; }
+      .resource-item { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <a href="index.html" class="brand">CCD / RESOURCES</a>
+    <div style="font-size: 0.8rem; color: var(--text-dim)">
+      <i class="fa-solid fa-circle-info"></i> Select a document to view
+    </div>
+  </header>
+
+  <div class="container">
+    <aside class="sidebar">
+      <h2>Library</h2>
+      <ul class="resource-list">
+        <li class="resource-item active" onclick="loadPDF('Resource1.pdf', this)">
+          <i class="fa-solid fa-file-pdf"></i>
+          <span>Resource 1</span>
+        </li>
+        
+        </ul>
+    </aside>
+
+    <main class="viewer" id="viewerArea">
+      <iframe id="pdfFrame" src="Resource1.pdf#toolbar=1&navpanes=0"></iframe>
+    </main>
+  </div>
+
+  <script>
+    function loadPDF(fileName, element) {
+      const frame = document.getElementById('pdfFrame');
+      // Adding parameters to the URL enables the native PDF UI features
+      frame.src = fileName + "#toolbar=1&navpanes=0&scrollbar=1";
+      
+      // Update UI
+      document.querySelectorAll('.resource-item').forEach(el => el.classList.remove('active'));
+      element.classList.add('active');
+    }
+  </script>
+</body>
+</html>
