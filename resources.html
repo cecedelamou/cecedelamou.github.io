@@ -290,6 +290,18 @@
 
     loadPDF('Resource0.pdf');
     window.addEventListener('resize', () => { if(pdfDoc) queueRenderPage(pageNum); });
+
+    // Keyboard Navigation
+window.addEventListener('keydown', (e) => {
+  // Ignore keyboard events if the user is typing in the page number input
+  if (document.activeElement.id === 'page-input') return;
+
+  if (e.key === 'ArrowLeft') {
+    prevPage();
+  } else if (e.key === 'ArrowRight') {
+    nextPage();
+  }
+});
   </script>
 </body>
 </html>
