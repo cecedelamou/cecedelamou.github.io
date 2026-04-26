@@ -18,31 +18,29 @@
       --accent: #ffffff;
       --text-dim: rgba(255, 255, 255, 0.6);
       --border: rgba(255, 255, 255, 0.1);
-      --font-main: 'Inter', sans-serif;
-      --font-mono: 'JetBrains Mono', monospace;
       --sidebar-width: 280px;
     }
 
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
     body, html {
       margin: 0; padding: 0;
       background: var(--bg);
       color: white;
-      font-family: var(--font-main);
-      height: 100vh;
-      overflow: hidden;
+      font-family: 'Inter', sans-serif;
+      height: 100%;
+      width: 100%;
+      overflow: hidden; /* Prevents the whole page from bouncing */
     }
 
-    /* Layout Container */
     .app-container {
       display: flex;
       height: 100vh;
       width: 100vw;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: transform 0.3s ease;
     }
 
-    /* Sidebar Styles */
+    /* Sidebar */
     .sidebar {
       width: var(--sidebar-width);
       min-width: var(--sidebar-width);
@@ -50,11 +48,9 @@
       border-right: 1px solid var(--border);
       display: flex;
       flex-direction: column;
-      transition: margin-left 0.3s ease;
-      z-index: 10;
+      z-index: 20;
     }
 
-    /* Collapsed State Logic */
     .app-container.collapsed .sidebar {
       margin-left: calc(-1 * var(--sidebar-width));
     }
@@ -65,8 +61,8 @@
     }
 
     .sidebar-header h1 {
-      font-size: 14px;
-      font-family: var(--font-mono);
+      font-size: 12px;
+      font-family: 'JetBrains Mono', monospace;
       letter-spacing: 2px;
       margin: 0;
       color: var(--text-dim);
@@ -77,96 +73,85 @@
       flex: 1;
       overflow-y: auto;
       padding: 12px;
-      list-style: none;
       margin: 0;
+      list-style: none;
     }
 
     .resource-item {
       padding: 14px 16px;
-      border-radius: 12px;
+      border-radius: 8px;
       cursor: pointer;
-      margin-bottom: 6px;
-      transition: 0.2s;
+      margin-bottom: 4px;
       font-size: 0.9rem;
       display: flex;
       align-items: center;
       gap: 12px;
-      border: 1px solid transparent;
+      transition: 0.2s;
     }
 
-    .resource-item:hover { background: rgba(255,255,255,0.05); }
-    .resource-item.active {
-      background: white;
-      color: black;
-      font-weight: 600;
-    }
+    .resource-item.active { background: white; color: black; font-weight: 600; }
 
-    /* Main Viewer Area */
+    /* Main Content Area */
     .viewer-main {
-      flex-grow: 1;
+      flex: 1;
       display: flex;
       flex-direction: column;
       background: #000;
-      position: relative;
+      min-width: 0; /* Important for flex child scaling */
     }
 
-    /* Control Bar */
     .control-bar {
-      height: 60px;
+      height: 56px;
       display: flex;
       align-items: center;
-      padding: 0 15px;
-      background: rgba(10,10,10,0.95);
+      padding: 0 16px;
+      background: var(--bg);
       border-bottom: 1px solid var(--border);
-      backdrop-filter: blur(10px);
     }
 
     .toggle-btn {
-      background: none;
+      background: var(--panel);
       border: 1px solid var(--border);
       color: white;
-      width: 36px;
-      height: 36px;
-      border-radius: 8px;
+      width: 40px;
+      height: 40px;
+      border-radius: 6px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: 0.2s;
     }
-
-    .toggle-btn:hover { background: var(--border); }
 
     .doc-title {
-      margin-left: 15px;
-      font-size: 14px;
-      font-weight: 500;
+      margin-left: 16px;
+      font-size: 0.85rem;
+      font-family: 'JetBrains Mono', monospace;
       color: var(--text-dim);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    /* The PDF Frame */
-    .iframe-container {
+    /* PDF Container - Fixed for Mobile Scrolling */
+    .pdf-wrapper {
       flex: 1;
       width: 100%;
       height: 100%;
+      overflow: auto; /* Allows independent scrolling */
+      -webkit-overflow-scrolling: touch; /* Forces smooth momentum scroll on iOS */
+      background: #1e1e1e;
     }
 
-    iframe {
+    object, embed, iframe {
       width: 100%;
       height: 100%;
-      border: none;
+      display: block;
     }
 
-    /* Mobile Adaptations */
     @media (max-width: 768px) {
       :root { --sidebar-width: 100%; }
       .app-container.collapsed .sidebar { margin-left: -100%; }
-      
-      /* Mobile: When sidebar is shown, it covers the screen */
-      .sidebar {
-        position: absolute;
-        height: 100%;
-      }
+      .sidebar { position: fixed; height: 100%; }
     }
   </style>
 </head>
@@ -176,26 +161,28 @@
     
     <aside class="sidebar">
       <div class="sidebar-header">
-        <h1>Library</h1>
+        <h1>Resources</h1>
       </div>
       <ul class="resource-list">
         <li class="resource-item active" onclick="loadPDF('Resource1.pdf', 'Resource 1', this)">
           <i class="fa-solid fa-file-pdf"></i>
           <span>Resource 1</span>
         </li>
-        </ul>
+      </ul>
     </aside>
 
     <main class="viewer-main">
       <div class="control-bar">
-        <button class="toggle-btn" onclick="toggleSidebar()" title="Toggle Sidebar">
-          <i class="fa-solid fa-arrows-left-right" id="toggleIcon"></i>
+        <button class="toggle-btn" onclick="toggleSidebar()">
+          <i class="fa-solid fa-bars" id="toggleIcon"></i>
         </button>
         <div class="doc-title" id="currentDocTitle">Resource 1</div>
       </div>
 
-      <div class="iframe-container">
-        <iframe id="pdfFrame" src="Resource1.pdf#view=Fit&toolbar=1&navpanes=0"></iframe>
+      <div class="pdf-wrapper" id="pdfContainer">
+        <object id="pdfObject" data="Resource1.pdf#view=FitH&scrollbar=1&toolbar=1" type="application/pdf">
+            <p>Your browser does not support PDFs. <a href="Resource1.pdf">Download instead.</a></p>
+        </object>
       </div>
     </main>
 
@@ -203,31 +190,23 @@
 
   <script>
     function toggleSidebar() {
-      const app = document.getElementById('app');
-      const icon = document.getElementById('toggleIcon');
-      app.classList.toggle('collapsed');
-      
-      // Toggle arrow icon direction if desired
-      if(app.classList.contains('collapsed')) {
-        icon.className = 'fa-solid fa-bars';
-      } else {
-        icon.className = 'fa-solid fa-arrows-left-right';
-      }
+      document.getElementById('app').classList.toggle('collapsed');
     }
 
     function loadPDF(file, title, element) {
-      const frame = document.getElementById('pdfFrame');
+      const container = document.getElementById('pdfContainer');
       const titleDisplay = document.getElementById('currentDocTitle');
       
-      // PDF Open Parameters: view=Fit ensures it fits the screen immediately
-      frame.src = file + "#view=Fit&toolbar=1&navpanes=0";
+      // We recreate the object to force a clean reload and reset the scroll position
+      container.innerHTML = `<object id="pdfObject" data="${file}#view=FitH&scrollbar=1&toolbar=1" type="application/pdf">
+          <p>Unable to display PDF. <a href="${file}">Download instead.</a></p>
+      </object>`;
+      
       titleDisplay.innerText = title;
 
-      // UI Update
       document.querySelectorAll('.resource-item').forEach(item => item.classList.remove('active'));
       element.classList.add('active');
 
-      // On mobile, automatically hide the sidebar after selecting a file
       if (window.innerWidth <= 768) {
         toggleSidebar();
       }
