@@ -21,6 +21,7 @@
       --text-dim: rgba(255, 255, 255, 0.6);
       --border: rgba(255, 255, 255, 0.1);
       --sidebar-width: 280px;
+      --font-mono: 'JetBrains Mono', monospace;
     }
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -34,11 +35,7 @@
       overflow: hidden;
     }
 
-    .app-container {
-      display: flex;
-      height: 100vh;
-      width: 100vw;
-    }
+    .app-container { display: flex; height: 100vh; width: 100vw; }
 
     /* Sidebar */
     .sidebar {
@@ -52,12 +49,10 @@
       transition: margin-left 0.3s ease;
     }
 
-    .app-container.collapsed .sidebar {
-      margin-left: calc(-1 * var(--sidebar-width));
-    }
+    .app-container.collapsed .sidebar { margin-left: calc(-1 * var(--sidebar-width)); }
 
     .sidebar-header { padding: 24px; border-bottom: 1px solid var(--border); }
-    .sidebar-header h1 { font-size: 12px; font-family: 'JetBrains Mono', monospace; letter-spacing: 2px; margin: 0; color: var(--text-dim); text-transform: uppercase; }
+    .sidebar-header h1 { font-size: 12px; font-family: var(--font-mono); letter-spacing: 2px; margin: 0; color: var(--text-dim); text-transform: uppercase; }
 
     .resource-list { flex: 1; overflow-y: auto; padding: 12px; margin: 0; list-style: none; }
     .resource-item { padding: 14px 16px; border-radius: 8px; cursor: pointer; margin-bottom: 4px; font-size: 0.9rem; display: flex; align-items: center; gap: 12px; transition: 0.2s; }
@@ -94,7 +89,33 @@
       font-size: 14px;
     }
 
-    .page-info { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-dim); }
+    /* Editable Page Navigation */
+    .page-nav-container {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+
+    #page-input {
+      width: 45px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      color: white;
+      text-align: center;
+      padding: 4px;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      outline: none;
+    }
+
+    #page-input:focus { border-color: rgba(255,255,255,0.4); }
+
+    /* Remove arrows from number input */
+    #page-input::-webkit-outer-spin-button,
+    #page-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 
     /* Canvas & Arrows */
     .viewport {
@@ -110,7 +131,6 @@
 
     canvas { box-shadow: 0 10px 30px rgba(0,0,0,0.5); max-width: 100%; }
 
-    /* Big Transparent Arrows */
     .arrow {
       position: absolute;
       top: 56px; bottom: 0;
@@ -130,13 +150,14 @@
 
     #loading {
       position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      font-family: 'JetBrains Mono', monospace; color: var(--text-dim);
+      font-family: var(--font-mono); color: var(--text-dim);
     }
 
     @media (max-width: 768px) {
       :root { --sidebar-width: 100%; }
       .sidebar { position: fixed; height: 100%; }
-      .arrow { width: 25%; font-size: 30px; } /* Larger hit area for mobile */
+      .arrow { width: 25%; font-size: 30px; }
+      .page-label-text { display: none; } /* Hide "Page" text on mobile to save space */
     }
   </style>
 </head>
@@ -158,8 +179,14 @@
       <div class="control-bar">
         <div class="nav-group">
           <button class="toggle-btn" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
-          <span class="page-info" id="page-num-display">Page 0 / 0</span>
+          
+          <div class="page-nav-container">
+            <span class="page-label-text">Page</span>
+            <input type="number" id="page-input" value="1" min="1" onchange="handlePageInput(this.value)">
+            <span id="page-total-display">/ 0</span>
+          </div>
         </div>
+
         <div class="nav-group">
           <button class="zoom-btn" onclick="zoomOut()"><i class="fa-solid fa-minus"></i></button>
           <button class="zoom-btn" onclick="zoomIn()"><i class="fa-solid fa-plus"></i></button>
@@ -167,7 +194,7 @@
       </div>
 
       <div class="viewport" id="viewport">
-        <div id="loading">Loading PDF...</div>
+        <div id="loading">Loading...</div>
         <canvas id="pdf-canvas"></canvas>
         
         <div class="arrow left" onclick="prevPage()"><i class="fa-solid fa-chevron-left"></i></div>
@@ -192,7 +219,6 @@
     function renderPage(num) {
       pageRendering = true;
       pdfDoc.getPage(num).then((page) => {
-        // Calculate scale to fit width by default
         const viewportContainer = document.getElementById('viewport');
         const unscaledViewport = page.getViewport({scale: 1});
         const autoScale = (viewportContainer.clientWidth * 0.9) / unscaledViewport.width;
@@ -201,10 +227,7 @@
         canvas.height = viewport.height;
         canvas.width = viewport.width;
 
-        const renderContext = {
-          canvasContext: ctx,
-          viewport: viewport
-        };
+        const renderContext = { canvasContext: ctx, viewport: viewport };
         const renderTask = page.render(renderContext);
 
         renderTask.promise.then(() => {
@@ -217,7 +240,9 @@
         });
       });
 
-      document.getElementById('page-num-display').textContent = `Page ${num} / ${pdfDoc.numPages}`;
+      // Update the input field and total count
+      document.getElementById('page-input').value = num;
+      document.getElementById('page-total-display').textContent = `/ ${pdfDoc.numPages}`;
     }
 
     function queueRenderPage(num) {
@@ -225,18 +250,19 @@
       else { renderPage(num); }
     }
 
-    function prevPage() {
-      if (pageNum <= 1) return;
-      pageNum--;
-      queueRenderPage(pageNum);
+    function handlePageInput(value) {
+      const num = parseInt(value);
+      if (num >= 1 && num <= pdfDoc.numPages) {
+        pageNum = num;
+        queueRenderPage(pageNum);
+      } else {
+        // Reset to current page if invalid
+        document.getElementById('page-input').value = pageNum;
+      }
     }
 
-    function nextPage() {
-      if (pageNum >= pdfDoc.numPages) return;
-      pageNum++;
-      queueRenderPage(pageNum);
-    }
-
+    function prevPage() { if (pageNum <= 1) return; pageNum--; queueRenderPage(pageNum); }
+    function nextPage() { if (pageNum >= pdfDoc.numPages) return; pageNum++; queueRenderPage(pageNum); }
     function zoomIn() { scale += 0.2; queueRenderPage(pageNum); }
     function zoomOut() { if (scale > 0.4) scale -= 0.2; queueRenderPage(pageNum); }
 
@@ -256,17 +282,10 @@
       if (window.innerWidth <= 768) toggleSidebar();
     }
 
-    function toggleSidebar() {
-      document.getElementById('app').classList.toggle('collapsed');
-    }
+    function toggleSidebar() { document.getElementById('app').classList.toggle('collapsed'); }
 
-    // Initial Load
     loadPDF('Resource1.pdf');
-
-    // Handle Window Resize
-    window.addEventListener('resize', () => {
-      if(pdfDoc) queueRenderPage(pageNum);
-    });
+    window.addEventListener('resize', () => { if(pdfDoc) queueRenderPage(pageNum); });
   </script>
 </body>
 </html>
