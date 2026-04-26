@@ -11,6 +11,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..900&family=JetBrains+Mono:wght@300..800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
   <style>
     :root {
       --bg: #0a0a0a;
@@ -28,16 +30,14 @@
       background: var(--bg);
       color: white;
       font-family: 'Inter', sans-serif;
-      height: 100%;
-      width: 100%;
-      overflow: hidden; /* Prevents the whole page from bouncing */
+      height: 100vh;
+      overflow: hidden;
     }
 
     .app-container {
       display: flex;
       height: 100vh;
       width: 100vw;
-      transition: transform 0.3s ease;
     }
 
     /* Sidebar */
@@ -48,56 +48,29 @@
       border-right: 1px solid var(--border);
       display: flex;
       flex-direction: column;
-      z-index: 20;
+      z-index: 100;
+      transition: margin-left 0.3s ease;
     }
 
     .app-container.collapsed .sidebar {
       margin-left: calc(-1 * var(--sidebar-width));
     }
 
-    .sidebar-header {
-      padding: 24px;
-      border-bottom: 1px solid var(--border);
-    }
+    .sidebar-header { padding: 24px; border-bottom: 1px solid var(--border); }
+    .sidebar-header h1 { font-size: 12px; font-family: 'JetBrains Mono', monospace; letter-spacing: 2px; margin: 0; color: var(--text-dim); text-transform: uppercase; }
 
-    .sidebar-header h1 {
-      font-size: 12px;
-      font-family: 'JetBrains Mono', monospace;
-      letter-spacing: 2px;
-      margin: 0;
-      color: var(--text-dim);
-      text-transform: uppercase;
-    }
-
-    .resource-list {
-      flex: 1;
-      overflow-y: auto;
-      padding: 12px;
-      margin: 0;
-      list-style: none;
-    }
-
-    .resource-item {
-      padding: 14px 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      margin-bottom: 4px;
-      font-size: 0.9rem;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      transition: 0.2s;
-    }
-
+    .resource-list { flex: 1; overflow-y: auto; padding: 12px; margin: 0; list-style: none; }
+    .resource-item { padding: 14px 16px; border-radius: 8px; cursor: pointer; margin-bottom: 4px; font-size: 0.9rem; display: flex; align-items: center; gap: 12px; transition: 0.2s; }
     .resource-item.active { background: white; color: black; font-weight: 600; }
 
-    /* Main Content Area */
+    /* Viewer Area */
     .viewer-main {
       flex: 1;
       display: flex;
       flex-direction: column;
       background: #000;
-      min-width: 0; /* Important for flex child scaling */
+      position: relative;
+      min-width: 0;
     }
 
     .control-bar {
@@ -107,51 +80,63 @@
       padding: 0 16px;
       background: var(--bg);
       border-bottom: 1px solid var(--border);
+      justify-content: space-between;
     }
 
-    .toggle-btn {
+    .nav-group { display: flex; align-items: center; gap: 10px; }
+    .toggle-btn, .zoom-btn {
       background: var(--panel);
       border: 1px solid var(--border);
       color: white;
-      width: 40px;
-      height: 40px;
+      padding: 8px 12px;
       border-radius: 6px;
       cursor: pointer;
+      font-size: 14px;
+    }
+
+    .page-info { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-dim); }
+
+    /* Canvas & Arrows */
+    .viewport {
+      flex: 1;
+      position: relative;
+      overflow: auto;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 20px 0;
+      background: #111;
+    }
+
+    canvas { box-shadow: 0 10px 30px rgba(0,0,0,0.5); max-width: 100%; }
+
+    /* Big Transparent Arrows */
+    .arrow {
+      position: absolute;
+      top: 56px; bottom: 0;
+      width: 15%;
       display: flex;
       align-items: center;
       justify-content: center;
+      cursor: pointer;
+      z-index: 10;
+      color: rgba(255,255,255,0.2);
+      font-size: 40px;
+      transition: all 0.3s;
     }
+    .arrow:hover { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.8); }
+    .arrow.left { left: 0; }
+    .arrow.right { right: 0; }
 
-    .doc-title {
-      margin-left: 16px;
-      font-size: 0.85rem;
-      font-family: 'JetBrains Mono', monospace;
-      color: var(--text-dim);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    /* PDF Container - Fixed for Mobile Scrolling */
-    .pdf-wrapper {
-      flex: 1;
-      width: 100%;
-      height: 100%;
-      overflow: auto; /* Allows independent scrolling */
-      -webkit-overflow-scrolling: touch; /* Forces smooth momentum scroll on iOS */
-      background: #1e1e1e;
-    }
-
-    object, embed, iframe {
-      width: 100%;
-      height: 100%;
-      display: block;
+    #loading {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      font-family: 'JetBrains Mono', monospace; color: var(--text-dim);
     }
 
     @media (max-width: 768px) {
       :root { --sidebar-width: 100%; }
-      .app-container.collapsed .sidebar { margin-left: -100%; }
       .sidebar { position: fixed; height: 100%; }
+      .arrow { width: 25%; font-size: 30px; } /* Larger hit area for mobile */
     }
   </style>
 </head>
@@ -160,11 +145,9 @@
   <div class="app-container" id="app">
     
     <aside class="sidebar">
-      <div class="sidebar-header">
-        <h1>Resources</h1>
-      </div>
+      <div class="sidebar-header"><h1>Library</h1></div>
       <ul class="resource-list">
-        <li class="resource-item active" onclick="loadPDF('Resource1.pdf', 'Resource 1', this)">
+        <li class="resource-item active" onclick="changePDF('Resource1.pdf', this)">
           <i class="fa-solid fa-file-pdf"></i>
           <span>Resource 1</span>
         </li>
@@ -173,44 +156,117 @@
 
     <main class="viewer-main">
       <div class="control-bar">
-        <button class="toggle-btn" onclick="toggleSidebar()">
-          <i class="fa-solid fa-bars" id="toggleIcon"></i>
-        </button>
-        <div class="doc-title" id="currentDocTitle">Resource 1</div>
+        <div class="nav-group">
+          <button class="toggle-btn" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+          <span class="page-info" id="page-num-display">Page 0 / 0</span>
+        </div>
+        <div class="nav-group">
+          <button class="zoom-btn" onclick="zoomOut()"><i class="fa-solid fa-minus"></i></button>
+          <button class="zoom-btn" onclick="zoomIn()"><i class="fa-solid fa-plus"></i></button>
+        </div>
       </div>
 
-      <div class="pdf-wrapper" id="pdfContainer">
-        <object id="pdfObject" data="Resource1.pdf#view=FitH&scrollbar=1&toolbar=1" type="application/pdf">
-            <p>Your browser does not support PDFs. <a href="Resource1.pdf">Download instead.</a></p>
-        </object>
+      <div class="viewport" id="viewport">
+        <div id="loading">Loading PDF...</div>
+        <canvas id="pdf-canvas"></canvas>
+        
+        <div class="arrow left" onclick="prevPage()"><i class="fa-solid fa-chevron-left"></i></div>
+        <div class="arrow right" onclick="nextPage()"><i class="fa-solid fa-chevron-right"></i></div>
       </div>
     </main>
 
   </div>
 
   <script>
+    const pdfjsLib = window['pdfjs-dist/build/pdf'];
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+    let pdfDoc = null,
+        pageNum = 1,
+        pageRendering = false,
+        pageNumPending = null,
+        scale = 1.2,
+        canvas = document.getElementById('pdf-canvas'),
+        ctx = canvas.getContext('2d');
+
+    function renderPage(num) {
+      pageRendering = true;
+      pdfDoc.getPage(num).then((page) => {
+        // Calculate scale to fit width by default
+        const viewportContainer = document.getElementById('viewport');
+        const unscaledViewport = page.getViewport({scale: 1});
+        const autoScale = (viewportContainer.clientWidth * 0.9) / unscaledViewport.width;
+        
+        const viewport = page.getViewport({scale: autoScale * scale});
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+
+        const renderContext = {
+          canvasContext: ctx,
+          viewport: viewport
+        };
+        const renderTask = page.render(renderContext);
+
+        renderTask.promise.then(() => {
+          pageRendering = false;
+          document.getElementById('loading').style.display = 'none';
+          if (pageNumPending !== null) {
+            renderPage(pageNumPending);
+            pageNumPending = null;
+          }
+        });
+      });
+
+      document.getElementById('page-num-display').textContent = `Page ${num} / ${pdfDoc.numPages}`;
+    }
+
+    function queueRenderPage(num) {
+      if (pageRendering) { pageNumPending = num; } 
+      else { renderPage(num); }
+    }
+
+    function prevPage() {
+      if (pageNum <= 1) return;
+      pageNum--;
+      queueRenderPage(pageNum);
+    }
+
+    function nextPage() {
+      if (pageNum >= pdfDoc.numPages) return;
+      pageNum++;
+      queueRenderPage(pageNum);
+    }
+
+    function zoomIn() { scale += 0.2; queueRenderPage(pageNum); }
+    function zoomOut() { if (scale > 0.4) scale -= 0.2; queueRenderPage(pageNum); }
+
+    function loadPDF(url) {
+      document.getElementById('loading').style.display = 'block';
+      pdfjsLib.getDocument(url).promise.then((pdfDoc_) => {
+        pdfDoc = pdfDoc_;
+        pageNum = 1;
+        renderPage(pageNum);
+      });
+    }
+
+    function changePDF(url, el) {
+      document.querySelectorAll('.resource-item').forEach(i => i.classList.remove('active'));
+      el.classList.add('active');
+      loadPDF(url);
+      if (window.innerWidth <= 768) toggleSidebar();
+    }
+
     function toggleSidebar() {
       document.getElementById('app').classList.toggle('collapsed');
     }
 
-    function loadPDF(file, title, element) {
-      const container = document.getElementById('pdfContainer');
-      const titleDisplay = document.getElementById('currentDocTitle');
-      
-      // We recreate the object to force a clean reload and reset the scroll position
-      container.innerHTML = `<object id="pdfObject" data="${file}#view=FitH&scrollbar=1&toolbar=1" type="application/pdf">
-          <p>Unable to display PDF. <a href="${file}">Download instead.</a></p>
-      </object>`;
-      
-      titleDisplay.innerText = title;
+    // Initial Load
+    loadPDF('Resource1.pdf');
 
-      document.querySelectorAll('.resource-item').forEach(item => item.classList.remove('active'));
-      element.classList.add('active');
-
-      if (window.innerWidth <= 768) {
-        toggleSidebar();
-      }
-    }
+    // Handle Window Resize
+    window.addEventListener('resize', () => {
+      if(pdfDoc) queueRenderPage(pageNum);
+    });
   </script>
 </body>
 </html>
