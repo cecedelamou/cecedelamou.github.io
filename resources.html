@@ -20,7 +20,10 @@
       --border: rgba(255, 255, 255, 0.1);
       --font-main: 'Inter', sans-serif;
       --font-mono: 'JetBrains Mono', monospace;
+      --sidebar-width: 280px;
     }
+
+    * { box-sizing: border-box; }
 
     body, html {
       margin: 0; padding: 0;
@@ -29,91 +32,123 @@
       font-family: var(--font-main);
       height: 100vh;
       overflow: hidden;
+    }
+
+    /* Layout Container */
+    .app-container {
+      display: flex;
+      height: 100vh;
+      width: 100vw;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Sidebar Styles */
+    .sidebar {
+      width: var(--sidebar-width);
+      min-width: var(--sidebar-width);
+      background: var(--panel);
+      border-right: 1px solid var(--border);
       display: flex;
       flex-direction: column;
+      transition: margin-left 0.3s ease;
+      z-index: 10;
     }
 
-    /* Top Navigation Bar */
-    .header {
-      padding: 1rem 2rem;
+    /* Collapsed State Logic */
+    .app-container.collapsed .sidebar {
+      margin-left: calc(-1 * var(--sidebar-width));
+    }
+
+    .sidebar-header {
+      padding: 24px;
       border-bottom: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(10, 10, 10, 0.8);
-      backdrop-filter: blur(10px);
     }
 
-    .brand {
+    .sidebar-header h1 {
+      font-size: 14px;
       font-family: var(--font-mono);
-      font-weight: 700;
-      letter-spacing: -1px;
-      text-decoration: none;
-      color: white;
-    }
-
-    /* Main Layout */
-    .container {
-      display: flex;
-      flex: 1;
-      overflow: hidden;
-    }
-
-    /* Sidebar */
-    .sidebar {
-      width: 300px;
-      border-right: 1px solid var(--border);
-      padding: 1.5rem;
-      overflow-y: auto;
-      background: var(--panel);
-    }
-
-    .sidebar h2 {
-      font-size: 0.8rem;
-      text-transform: uppercase;
       letter-spacing: 2px;
+      margin: 0;
       color: var(--text-dim);
-      margin-bottom: 1.5rem;
+      text-transform: uppercase;
     }
 
     .resource-list {
-      list-style: none; padding: 0; margin: 0;
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+      list-style: none;
+      margin: 0;
     }
 
     .resource-item {
-      padding: 12px 16px;
-      border-radius: 8px;
+      padding: 14px 16px;
+      border-radius: 12px;
       cursor: pointer;
-      margin-bottom: 8px;
-      transition: all 0.2s ease;
-      border: 1px solid transparent;
+      margin-bottom: 6px;
+      transition: 0.2s;
+      font-size: 0.9rem;
       display: flex;
       align-items: center;
       gap: 12px;
-      font-size: 0.9rem;
+      border: 1px solid transparent;
     }
 
-    .resource-item:hover {
-      background: rgba(255, 255, 255, 0.05);
-    }
-
+    .resource-item:hover { background: rgba(255,255,255,0.05); }
     .resource-item.active {
       background: white;
       color: black;
+      font-weight: 600;
     }
 
-    .resource-item i {
-      font-size: 1rem;
-      opacity: 0.7;
-    }
-
-    /* Viewer Area */
-    .viewer {
-      flex: 1;
-      background: #1e1e1e;
+    /* Main Viewer Area */
+    .viewer-main {
+      flex-grow: 1;
       display: flex;
       flex-direction: column;
+      background: #000;
       position: relative;
+    }
+
+    /* Control Bar */
+    .control-bar {
+      height: 60px;
+      display: flex;
+      align-items: center;
+      padding: 0 15px;
+      background: rgba(10,10,10,0.95);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(10px);
+    }
+
+    .toggle-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: white;
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.2s;
+    }
+
+    .toggle-btn:hover { background: var(--border); }
+
+    .doc-title {
+      margin-left: 15px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-dim);
+    }
+
+    /* The PDF Frame */
+    .iframe-container {
+      flex: 1;
+      width: 100%;
+      height: 100%;
     }
 
     iframe {
@@ -122,56 +157,80 @@
       border: none;
     }
 
-    .empty-state {
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      text-align: center;
-      color: var(--text-dim);
-    }
-
+    /* Mobile Adaptations */
     @media (max-width: 768px) {
-      .sidebar { width: 80px; padding: 1rem; }
-      .sidebar h2, .resource-item span { display: none; }
-      .resource-item { justify-content: center; }
+      :root { --sidebar-width: 100%; }
+      .app-container.collapsed .sidebar { margin-left: -100%; }
+      
+      /* Mobile: When sidebar is shown, it covers the screen */
+      .sidebar {
+        position: absolute;
+        height: 100%;
+      }
     }
   </style>
 </head>
 <body>
 
-  <header class="header">
-    <a href="index.html" class="brand">CCD / RESOURCES</a>
-    <div style="font-size: 0.8rem; color: var(--text-dim)">
-      <i class="fa-solid fa-circle-info"></i> Select a document to view
-    </div>
-  </header>
-
-  <div class="container">
+  <div class="app-container" id="app">
+    
     <aside class="sidebar">
-      <h2>Library</h2>
+      <div class="sidebar-header">
+        <h1>Library</h1>
+      </div>
       <ul class="resource-list">
-        <li class="resource-item active" onclick="loadPDF('Resource1.pdf', this)">
+        <li class="resource-item active" onclick="loadPDF('Resource1.pdf', 'Resource 1', this)">
           <i class="fa-solid fa-file-pdf"></i>
           <span>Resource 1</span>
         </li>
-        
         </ul>
     </aside>
 
-    <main class="viewer" id="viewerArea">
-      <iframe id="pdfFrame" src="Resource1.pdf#toolbar=1&navpanes=0"></iframe>
+    <main class="viewer-main">
+      <div class="control-bar">
+        <button class="toggle-btn" onclick="toggleSidebar()" title="Toggle Sidebar">
+          <i class="fa-solid fa-arrows-left-right" id="toggleIcon"></i>
+        </button>
+        <div class="doc-title" id="currentDocTitle">Resource 1</div>
+      </div>
+
+      <div class="iframe-container">
+        <iframe id="pdfFrame" src="Resource1.pdf#view=Fit&toolbar=1&navpanes=0"></iframe>
+      </div>
     </main>
+
   </div>
 
   <script>
-    function loadPDF(fileName, element) {
-      const frame = document.getElementById('pdfFrame');
-      // Adding parameters to the URL enables the native PDF UI features
-      frame.src = fileName + "#toolbar=1&navpanes=0&scrollbar=1";
+    function toggleSidebar() {
+      const app = document.getElementById('app');
+      const icon = document.getElementById('toggleIcon');
+      app.classList.toggle('collapsed');
       
-      // Update UI
-      document.querySelectorAll('.resource-item').forEach(el => el.classList.remove('active'));
+      // Toggle arrow icon direction if desired
+      if(app.classList.contains('collapsed')) {
+        icon.className = 'fa-solid fa-bars';
+      } else {
+        icon.className = 'fa-solid fa-arrows-left-right';
+      }
+    }
+
+    function loadPDF(file, title, element) {
+      const frame = document.getElementById('pdfFrame');
+      const titleDisplay = document.getElementById('currentDocTitle');
+      
+      // PDF Open Parameters: view=Fit ensures it fits the screen immediately
+      frame.src = file + "#view=Fit&toolbar=1&navpanes=0";
+      titleDisplay.innerText = title;
+
+      // UI Update
+      document.querySelectorAll('.resource-item').forEach(item => item.classList.remove('active'));
       element.classList.add('active');
+
+      // On mobile, automatically hide the sidebar after selecting a file
+      if (window.innerWidth <= 768) {
+        toggleSidebar();
+      }
     }
   </script>
 </body>
